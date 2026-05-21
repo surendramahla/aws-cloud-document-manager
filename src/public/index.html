@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Cloud Document Cabin | Secure S3 Storage Console</title>
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glass-bg-container">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <div class="dashboard-wrapper">
+      <!-- Top Navigation / Status Header -->
+      <header class="main-header glass-panel">
+        <div class="header-logo">
+          <div class="logo-icon-bg">
+            <i class="fa-brands fa-aws logo-icon"></i>
+          </div>
+          <div class="logo-text">
+            <h1>AWS Cloud Document Cabin</h1>
+            <p>Secure S3 Storage & Database Synchronizer</p>
+          </div>
+        </div>
+
+        <div class="system-status">
+          <div class="status-node" id="db-status-node">
+            <span class="status-dot pulsing red" id="db-dot"></span>
+            <span class="status-label">MySQL DB: <strong id="db-text">Checking...</strong></span>
+          </div>
+          <div class="status-node" id="s3-status-node">
+            <span class="status-dot pulsing red" id="s3-dot"></span>
+            <span class="status-label">AWS S3: <strong id="s3-text">Checking...</strong></span>
+          </div>
+          <button id="refresh-health-btn" class="icon-btn" title="Refresh System Status">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Contents Grid -->
+      <main class="dashboard-grid">
+        
+        <!-- Left Column: Controls, Config & Stats -->
+        <section class="left-column">
+          <!-- Configuration Card -->
+          <div class="glass-panel card flex-card">
+            <div class="card-header">
+              <i class="fa-solid fa-sliders header-icon"></i>
+              <h2>Upload Configuration</h2>
+            </div>
+            
+            <div class="form-grid">
+              <div class="input-group">
+                <label for="uploader-name-input"><i class="fa-solid fa-user"></i> Uploaded By</label>
+                <input type="text" id="uploader-name-input" value="Amish" placeholder="Enter your name">
+              </div>
+              <div class="input-group">
+                <label for="team-id-input"><i class="fa-solid fa-people-group"></i> Team ID</label>
+                <input type="text" id="team-id-input" value="team-1" placeholder="e.g. team-1, finance">
+              </div>
+            </div>
+
+            <div class="upload-method-selector">
+              <label class="section-label">Upload Architecture</label>
+              <div class="method-toggles">
+                <button type="button" class="method-btn active" id="method-server">
+                  <div class="btn-content">
+                    <i class="fa-solid fa-server"></i>
+                    <div>
+                      <span class="method-title">Express Proxy</span>
+                      <span class="method-desc">Buffer Upload through server</span>
+                    </div>
+                  </div>
+                </button>
+                <button type="button" class="method-btn" id="method-presigned">
+                  <div class="btn-content text-gradient-gold">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                      <span class="method-title">S3 Presigned URL</span>
+                      <span class="method-desc">Direct high-performance upload</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drag and Drop Upload Card -->
+          <div class="glass-panel card file-uploader-card">
+            <div class="card-header">
+              <i class="fa-solid fa-cloud-arrow-up header-icon"></i>
+              <h2>Secure Drag & Drop</h2>
+            </div>
+            
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="file-input" class="hidden-file-input">
+              <div class="drop-zone-content">
+                <div class="cloud-icon-wrapper">
+                  <i class="fa-solid fa-cloud-arrow-up cloud-bounce"></i>
+                </div>
+                <h3>Drag & drop report here</h3>
+                <p>or <span class="browse-link">browse local files</span></p>
+                <span class="file-limits">Supports documents, images, logs up to 50MB</span>
+              </div>
+            </div>
+
+            <!-- Upload Progress Monitor -->
+            <div class="upload-progress-container hidden" id="progress-container">
+              <div class="progress-info">
+                <span class="filename" id="progress-filename">Document.pdf</span>
+                <span class="percentage" id="progress-percentage">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+              </div>
+              <div class="progress-status" id="progress-status">Uploading to S3...</div>
+            </div>
+          </div>
+
+          <!-- Architecture Diagnostics -->
+          <div class="glass-panel card stats-card">
+            <div class="card-header">
+              <i class="fa-solid fa-microchip header-icon"></i>
+              <h2>System Diagnostics</h2>
+            </div>
+            <div class="diagnostics-grid">
+              <div class="diagnostic-item">
+                <span class="diag-label">Runtime Uptime</span>
+                <span class="diag-val" id="diag-uptime">0s</span>
+              </div>
+              <div class="diagnostic-item">
+                <span class="diag-label">Memory Allocation</span>
+                <span class="diag-val" id="diag-memory">0 MB</span>
+              </div>
+              <div class="diagnostic-item">
+                <span class="diag-label">Node Environment</span>
+                <span class="diag-val" id="diag-env">-</span>
+              </div>
+              <div class="diagnostic-item">
+                <span class="diag-label">AWS Custom Endpoint</span>
+                <span class="diag-val" id="diag-endpoint">-</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Column: Document Grid -->
+        <section class="right-column glass-panel">
+          <div class="grid-header">
+            <div class="grid-title">
+              <i class="fa-solid fa-folder-open header-icon text-accent"></i>
+              <h2>Document Database Repository</h2>
+            </div>
+            <div class="grid-actions">
+              <!-- Search Input -->
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search by filename...">
+              </div>
+              <!-- Team Select Filter -->
+              <div class="filter-box">
+                <select id="team-filter">
+                  <option value="">All Teams</option>
+                  <option value="team-1">Team 1</option>
+                  <option value="team-2">Team 2</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents List Container -->
+          <div class="table-container">
+            <table class="documents-table">
+              <thead>
+                <tr>
+                  <th>File Details</th>
+                  <th>S3 Storage Key</th>
+                  <th>Size</th>
+                  <th>Uploaded By / Team</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="documents-table-body">
+                <!-- Seeding indicators -->
+                <tr class="table-state-row">
+                  <td colspan="5">
+                    <div class="table-loading-spinner">
+                      <i class="fa-solid fa-circle-notch fa-spin"></i>
+                      <p>Synchronizing files from S3 bucket database...</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state hidden" id="empty-state">
+            <i class="fa-solid fa-folder-closed empty-icon"></i>
+            <h3>No documents found</h3>
+            <p>Upload a new file using the console on the left to sync it to AWS S3 & MySQL.</p>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Architecture Footnote -->
+      <footer class="main-footer">
+        <p><i class="fa-solid fa-code-fork"></i> Powered by Node.js Express, AWS SDK v3, MySQL connection pools, and LocalStack Cloud Sandbox.</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
